@@ -1,14 +1,16 @@
 /**
- * Created by Eric on 4/19/2016.
+ * Project: FacialRecognition
+ * Name: Eric
+ * Created on 20 April, 2016
  */
+
 public class FacialRecognition {
 
-    public FacialRecognition (){
+    public FacialRecognition() {
 
     }
 
     public static void main(String[] args) {
         new FacialRecognition();
     }
-
 }
