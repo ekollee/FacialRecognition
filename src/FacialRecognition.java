@@ -1,3 +1,5 @@
+import neuralnetwork.NeuralNetwork;
+
 /**
  * Project: FacialRecognition
  * Name: Eric
@@ -10,6 +12,7 @@ public class FacialRecognition {
         ImageProcessor imageProcessor = new ImageProcessor("testImage.jpg");
 
         imageProcessor.detectSkin();
+        NeuralNetwork.getInstance().printStatistics();
 
     }
 

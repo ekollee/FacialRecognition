@@ -92,13 +92,19 @@ public class NeuralNetwork {
             List<String[]> trainingSet = new ArrayList<>();
             try {
                 trainingSet = readData("Skin_NonSkin.csv");
+                Collections.shuffle(trainingSet);
+                double reductionAmount = trainingSet.size()*0.95;
+                for (int i = 0; i < reductionAmount-1; i++) {
+                    trainingSet.remove(0);
+                }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            int epoch = 20;
+            int epoch = 10;
             double learningRate = .2;
-            double momentum = 0;
+            double momentum = .1;
             boolean tanh = false;
             List<Integer> hiddenLayers = new ArrayList<>();
             hiddenLayers.add(6);
