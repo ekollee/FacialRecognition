@@ -8,7 +8,9 @@ public class FacialRecognition {
 
     public FacialRecognition() {
         ImageProcessor imageProcessor = new ImageProcessor("testImage.jpg");
+
         imageProcessor.detectSkin();
+
     }
 
     public static void main(String[] args) {

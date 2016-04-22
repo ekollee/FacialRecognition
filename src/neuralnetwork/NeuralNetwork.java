@@ -137,7 +137,7 @@ public class NeuralNetwork {
 
     private boolean forwardPass(String[] example) {
         for (int i = 0; i < layers.get(0).neurons.size(); i++) {
-            layers.get(0).neurons.get(i).value = Double.parseDouble(example[i]); //Set value of input layer
+            layers.get(0).neurons.get(i).value = Double.parseDouble(example[i])/255; //Set value of input layer
         }
 
         for (int i = 1; i < layers.size(); i++) {

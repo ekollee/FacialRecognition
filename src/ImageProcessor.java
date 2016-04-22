@@ -1,3 +1,5 @@
+import neuralnetwork.NeuralNetwork;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -30,27 +32,13 @@ public class ImageProcessor {
     }
 
     public void detectSkin() {
-        ArrayList trainingSet = new ArrayList<>();
-        try {
-            trainingSet = readData("Skin_NonSkin.csv");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        int epoch = 20;
-        double learningRate = .2;
-        double momentum = 0;
-        boolean tanh = false;
-        List<Integer> hiddenLayers = new ArrayList<>();
-        hiddenLayers.add(6);
-
-        SkinNeuralNetwork neuralNetwork = new SkinNeuralNetwork(trainingSet, epoch, learningRate, momentum, tanh, hiddenLayers);
+        NeuralNetwork ANN = NeuralNetwork.getInstance();
 
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 int rgb = image.getRGB(x, y);
-
-                if (neuralNetwork.isRGBSkin(getRed(rgb), getGreen(rgb), getBlue(rgb))) {
+                String [] sample = {Double.toString(getRed(rgb)/255.0), Double.toString(getGreen(rgb)/255.0), Double.toString(getBlue(rgb)/255.0)};
+                if (ANN.getClassification(sample).equals("1")){
                     image.setRGB(x, y, Color.white.getRGB());
                 } else {
                     image.setRGB(x, y, Color.black.getRGB());
