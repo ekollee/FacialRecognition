@@ -1,5 +1,8 @@
 package neuralnetwork;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +12,8 @@ import java.util.Random;
  * @author Eric
  */
 public class NeuralNetwork {
+
+    public static NeuralNetwork INSTANCE;
 
     double correct;
     double testingCorrect;
@@ -24,7 +29,7 @@ public class NeuralNetwork {
     List<Double> trainingPerformance;
     List<Double> testingPerformance;
 
-    public NeuralNetwork(List<String[]> trainingSet, int epochs, double learningRate, double momentum, boolean tanhFunction, List<Integer> hiddenLayerSize) {
+    private NeuralNetwork(List<String[]> trainingSet, int epochs, double learningRate, double momentum, boolean tanhFunction, List<Integer> hiddenLayerSize) {
 
         this.trainingSet = new ArrayList<>();
         this.trainingSet.addAll(trainingSet);
@@ -79,6 +84,29 @@ public class NeuralNetwork {
 
         }
 
+
+    }
+
+    public static NeuralNetwork getInstance() {
+        if (INSTANCE == null) {
+            List<String[]> trainingSet = new ArrayList<>();
+            try {
+                trainingSet = readData("Skin_NonSkin.csv");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            int epoch = 20;
+            double learningRate = .2;
+            double momentum = 0;
+            boolean tanh = false;
+            List<Integer> hiddenLayers = new ArrayList<>();
+            hiddenLayers.add(6);
+
+            NeuralNetwork ANN = new NeuralNetwork(trainingSet, epoch, learningRate, momentum, tanh, hiddenLayers);
+            INSTANCE = ANN;
+        }
+        return INSTANCE;
     }
 
     private void initializeNetwork(List<Integer> hiddenLayerSize) {
@@ -172,6 +200,26 @@ public class NeuralNetwork {
         }
         System.out.println("Best Training Result: " + Collections.max(trainingPerformance));
         System.out.println("Best Testing Result: " + Collections.max(testingPerformance));
+    }
+
+    private static ArrayList readData(String filename) throws IOException {
+        BufferedReader reader;
+        String inputString;
+        String splitChar = ",";
+        ArrayList<String[]> result = new ArrayList<>();
+
+        reader = new BufferedReader(new FileReader(filename));
+        while ((inputString = reader.readLine()) != null) {
+
+            // use comma as separator
+            String[] data = inputString.split(splitChar);
+            result.add(data);
+
+        }
+
+        reader.close();
+
+        return result;
     }
 
     private static double randomDouble(double min, double max) {
