@@ -147,7 +147,20 @@ public class NeuralNetwork {
         }
 
         return Collections.max(layers.get(layers.size() - 1).neurons, new Neuron()).classification.equals(example[example.length - 1]);
+    }
 
+    public String getClassification (String[] input){
+        for (int i = 0; i < layers.get(0).neurons.size(); i++) {
+            layers.get(0).neurons.get(i).value = Double.parseDouble(input[i]); //Set value of input layer
+        }
+
+        for (int i = 1; i < layers.size(); i++) {
+            for (Neuron neuron : layers.get(i).neurons) {
+                neuron.updateValue(tanhFunction);
+            }
+        }
+
+        return Collections.max(layers.get(layers.size() - 1).neurons, new Neuron()).classification;
     }
 
     private void backPropError(String expectedClassification) {
@@ -171,7 +184,6 @@ public class NeuralNetwork {
             }
         }
         //   return result;
-
     }
 
     private void updateWeights() {
