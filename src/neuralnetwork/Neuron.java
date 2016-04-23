@@ -1,47 +1,42 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package neuralnetwork;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
 /**
- * @author Eric
+ * Project: Assign1
+ * Course: COSC 4P76
+ * Name: Graham Burgsma
+ * Created on 18 February, 2016
  */
+
 public class Neuron implements Comparator<Neuron> {
 
-    double value;
-    double error;
-    double sum;
-    String classification;
-    List<Link> links;
+    public ArrayList<Edge> edges;
+    public double value, error;
+    public String classification;
 
     public Neuron() {
-        links = new ArrayList<>();
-        error = 0;
+        edges = new ArrayList<>();
     }
 
-    public void updateValue(boolean tanhFunction) {
-        sum = 0;
-        error = 0;
-        for (Link link : links) {
-            sum += link.backNode.value * link.weight;
-        }
-        if (tanhFunction) {
-            value = Math.tanh(sum);
-        } else {
-            value = 1 / (1 + Math.exp(-sum));
-        }
+    public double inputWeightedSum() {
+        double sum = 0;
 
+        for (Edge edge : edges) {
+            sum += edge.neuronFront.value * edge.weight;
+        }
+        return sum;
+    }
+
+    public void connect(ArrayList<Neuron> neurons) {
+        for (Neuron neuron : neurons) {
+            edges.add(new Edge(neuron));
+        }
     }
 
     @Override
-    public int compare(Neuron n1, Neuron n2) {
-        return Double.compare(n1.value, n2.value);
+    public int compare(Neuron o1, Neuron o2) {
+        return Double.compare(o1.value, o2.value);
     }
-
 }

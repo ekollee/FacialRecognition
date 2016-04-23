@@ -1,26 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package neuralnetwork;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
- * @author Eric
+ * Project: Assign1
+ * Course: COSC 4P76
+ * Name: Graham Burgsma
+ * Created on 18 February, 2016
  */
+
 public class Layer {
 
-    List<Neuron> neurons;
+    ArrayList<Neuron> neurons = new ArrayList<Neuron>();
 
-    public Layer(int size) {
-        neurons = new ArrayList<>();
-
-        for (int i = 0; i < size; i++) {
+    public Layer(int count) {
+        for (int i = 0; i < count; i++) {
             neurons.add(new Neuron());
         }
+    }
+
+    public int count() {
+        return neurons.size();
     }
 
 }

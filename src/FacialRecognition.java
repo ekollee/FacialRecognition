@@ -1,4 +1,3 @@
-import neuralnetwork.NeuralNetwork;
 
 /**
  * Project: FacialRecognition
@@ -9,11 +8,9 @@ import neuralnetwork.NeuralNetwork;
 public class FacialRecognition {
 
     public FacialRecognition() {
-        ImageProcessor imageProcessor = new ImageProcessor("testImage.jpg");
+        ImageProcessor imageProcessor = new ImageProcessor("testImage1.jpg");
 
         imageProcessor.detectSkin();
-        NeuralNetwork.getInstance().printStatistics();
-
     }
 
     public static void main(String[] args) {
