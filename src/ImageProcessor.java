@@ -1,6 +1,6 @@
 import neuralnetwork.DataReader;
 import neuralnetwork.DataSample;
-import neuralnetwork.NeuralNetwork2;
+import neuralnetwork.NeuralNetwork;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -31,7 +31,7 @@ public class ImageProcessor {
 
     public void detectSkin() {
         SkinNeuralNetwork neuralNetwork = SkinNeuralNetwork.getInstance();
-        NeuralNetwork2.Results results = neuralNetwork.runNetwork(10, 5, DataReader.readSkinData());
+        NeuralNetwork.Results results = neuralNetwork.runNetwork(10, 5, DataReader.readSkinData());
 
         neuralNetwork.printResults(results);
 

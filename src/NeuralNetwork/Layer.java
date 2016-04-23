@@ -9,13 +9,13 @@ import java.util.ArrayList;
  * Created on 18 February, 2016
  */
 
-public class Layer2 {
+public class Layer {
 
-    ArrayList<Neuron2> neurons = new ArrayList<Neuron2>();
+    ArrayList<Neuron> neurons = new ArrayList<Neuron>();
 
-    public Layer2(int count) {
+    public Layer(int count) {
         for (int i = 0; i < count; i++) {
-            neurons.add(new Neuron2());
+            neurons.add(new Neuron());
         }
     }
 
