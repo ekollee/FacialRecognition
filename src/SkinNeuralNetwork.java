@@ -1,6 +1,6 @@
 import neuralnetwork.DataReader;
 import neuralnetwork.DataSample;
-import neuralnetwork.NeuralNetwork;
+import neuralnetwork.NeuralNetwork2;
 
 import java.util.ArrayList;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * Name: Graham Burgsma
  * Created on 22 April, 2016
  */
-public class SkinNeuralNetwork extends NeuralNetwork {
+public class SkinNeuralNetwork extends NeuralNetwork2 {
 
     private static final int INPUT_NODES = 3;
     private static final int HIDDEN_NODES = 8;
@@ -22,7 +22,7 @@ public class SkinNeuralNetwork extends NeuralNetwork {
 
     private static SkinNeuralNetwork ourInstance = new SkinNeuralNetwork(INPUT_NODES, HIDDEN_NODES, HIDDEN_LAYERS, OUTPUT_NODES, LEARNING_RATE, MOMENTUM_RATE, DataReader.readSkinData(), ACTIVATION_FUNCTION);
 
-    public SkinNeuralNetwork(int inputCount, int hiddenCount, int hiddenLayersCount, int outputCount, double learningRate, double momentumRate, ArrayList<DataSample> dataArrayList, NeuralNetwork.ActivationFunction activationFunction) {
+    public SkinNeuralNetwork(int inputCount, int hiddenCount, int hiddenLayersCount, int outputCount, double learningRate, double momentumRate, ArrayList<DataSample> dataArrayList, NeuralNetwork2.ActivationFunction activationFunction) {
         super(inputCount, hiddenCount, hiddenLayersCount, outputCount, learningRate, momentumRate, dataArrayList, activationFunction);
     }
 

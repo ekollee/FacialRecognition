@@ -16,18 +16,18 @@ import java.util.stream.Collectors;
  * Created on 18 February, 2016
  */
 
-public class NeuralNetwork {
+public class NeuralNetwork2 {
 
-    Layer inputLayer;
-    ArrayList<Layer> hiddenLayers = new ArrayList<>();
-    Layer outputLayer;
-    ArrayList<Layer> allLayers = new ArrayList<>();
+    Layer2 inputLayer;
+    ArrayList<Layer2> hiddenLayers = new ArrayList<>();
+    Layer2 outputLayer;
+    ArrayList<Layer2> allLayers = new ArrayList<>();
 
     private double learningRate, deltaWeight, momentumRate;
     private int epochs, folds, numHiddenNodes, numHiddenLayers, numInputNodes, numOutputNodes;
     private ActivationFunction activationFunction;
 
-    public NeuralNetwork(int inputCount, int hiddenCount, int hiddenLayersCount, int outputCount, double learningRate, double momentumRate, ArrayList<DataSample> dataArrayList, ActivationFunction activationFunction) {
+    public NeuralNetwork2(int inputCount, int hiddenCount, int hiddenLayersCount, int outputCount, double learningRate, double momentumRate, ArrayList<DataSample> dataArrayList, ActivationFunction activationFunction) {
         this.learningRate = learningRate;
         this.momentumRate = momentumRate;
         this.activationFunction = activationFunction;
@@ -39,11 +39,11 @@ public class NeuralNetwork {
         RandomGenerator.getInstance().createNewRandom();
 
         for (int i = 0; i < hiddenLayersCount; i++) {
-            hiddenLayers.add(new Layer(hiddenCount));
+            hiddenLayers.add(new Layer2(hiddenCount));
         }
 
-        inputLayer = new Layer(inputCount);
-        outputLayer = new Layer(outputCount);
+        inputLayer = new Layer2(inputCount);
+        outputLayer = new Layer2(outputCount);
 
         HashSet<String> classifications = dataArrayList.stream().map(sample -> sample.classification).collect(Collectors.toCollection(HashSet::new));
 
@@ -151,7 +151,7 @@ public class NeuralNetwork {
 
     private void assembleNetwork() {
         for (int i = 0; i < hiddenLayers.size(); i++) {
-            for (Neuron neuron : hiddenLayers.get(i).neurons) {
+            for (Neuron2 neuron : hiddenLayers.get(i).neurons) {
 
                 if (i == 0) {
                     neuron.connect(inputLayer.neurons);
@@ -160,7 +160,7 @@ public class NeuralNetwork {
                 }
             }
         }
-        for (Neuron neuron : outputLayer.neurons) {
+        for (Neuron2 neuron : outputLayer.neurons) {
             neuron.connect(hiddenLayers.get(hiddenLayers.size() - 1).neurons);
         }
     }
@@ -173,18 +173,18 @@ public class NeuralNetwork {
 
         //Forward pass, weighted sum for hidden layers and output layer
         for (int i = 1; i < allLayers.size(); i++) {
-            for (Neuron neuron : allLayers.get(i).neurons) {
+            for (Neuron2 neuron : allLayers.get(i).neurons) {
                 neuron.value = activationFunction(neuron.inputWeightedSum());
             }
         }
 
-        return Collections.max(outputLayer.neurons, new Neuron()).classification;
+        return Collections.max(outputLayer.neurons, new Neuron2()).classification;
     }
 
     public void backPropagation() {
         //Error backwards
         for (int i = allLayers.size() - 1; i > 0; i--) {
-            for (Neuron neuron : allLayers.get(i).neurons) {
+            for (Neuron2 neuron : allLayers.get(i).neurons) {
                 for (Edge edge : neuron.edges) {
                     edge.neuronFront.error = edge.weight * neuron.error;
                 }
@@ -193,7 +193,7 @@ public class NeuralNetwork {
 
         //Update weights
         for (int i = 1; i < allLayers.size(); i++) {
-            for (Neuron neuron : allLayers.get(i).neurons) {
+            for (Neuron2 neuron : allLayers.get(i).neurons) {
                 for (Edge edge : neuron.edges) {
                     deltaWeight = learningRate * neuron.error * activationFunctionDerivative(neuron.inputWeightedSum()) * edge.neuronFront.value + momentumRate * deltaWeight;
                     edge.weight += deltaWeight;
@@ -203,9 +203,9 @@ public class NeuralNetwork {
     }
 
     public boolean checkError(String classification) {
-        Neuron max = Collections.max(outputLayer.neurons, new Neuron());
+        Neuron2 max = Collections.max(outputLayer.neurons, new Neuron2());
 
-        for (Neuron neuron : outputLayer.neurons) {
+        for (Neuron2 neuron : outputLayer.neurons) {
             if (classification.equals(neuron.classification)) {
                 neuron.error = 1 - neuron.value;
             } else {

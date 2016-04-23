@@ -10,13 +10,13 @@ import java.util.Comparator;
  * Created on 18 February, 2016
  */
 
-public class Neuron implements Comparator<Neuron> {
+public class Neuron2 implements Comparator<Neuron2> {
 
     public ArrayList<Edge> edges;
     public double value, error;
     public String classification;
 
-    public Neuron() {
+    public Neuron2() {
         edges = new ArrayList<>();
     }
 
@@ -29,14 +29,14 @@ public class Neuron implements Comparator<Neuron> {
         return sum;
     }
 
-    public void connect(ArrayList<Neuron> neurons) {
-        for (Neuron neuron : neurons) {
+    public void connect(ArrayList<Neuron2> neurons) {
+        for (Neuron2 neuron : neurons) {
             edges.add(new Edge(neuron));
         }
     }
 
     @Override
-    public int compare(Neuron o1, Neuron o2) {
+    public int compare(Neuron2 o1, Neuron2 o2) {
         return Double.compare(o1.value, o2.value);
     }
 }
