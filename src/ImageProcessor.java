@@ -29,6 +29,10 @@ public class ImageProcessor {
         image = ImageIO.read(file);
     }
 
+    public BufferedImage getImage() {
+        return image;
+    }
+
     public void detectSkin() {
         SkinNeuralNetwork neuralNetwork = SkinNeuralNetwork.getInstance();
         NeuralNetwork.Results results = neuralNetwork.runNetwork(10, 5, DataReader.readSkinData());
@@ -52,10 +56,11 @@ public class ImageProcessor {
             }
         }
 
-        displayImage(image);
+        saveImage(image);
     }
 
-    public void displayImage(BufferedImage image) {
+
+    public void saveImage(BufferedImage image) {
         File outputfile = new File("testOutput.jpg");
         try {
             ImageIO.write(image, "png", outputfile);

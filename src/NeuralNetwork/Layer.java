@@ -11,16 +11,11 @@ import java.util.ArrayList;
 
 public class Layer {
 
-    ArrayList<Neuron> neurons = new ArrayList<Neuron>();
+    ArrayList<Neuron> neurons = new ArrayList<>();
 
     public Layer(int count) {
         for (int i = 0; i < count; i++) {
             neurons.add(new Neuron());
         }
     }
-
-    public int count() {
-        return neurons.size();
-    }
-
 }
