@@ -56,12 +56,55 @@ public class ImageProcessor {
             }
         }
 
-        saveImage(image);
+        saveImage(image, "blackWhite.jpg");
     }
 
 
-    public void saveImage(BufferedImage image) {
-        File outputfile = new File("testOutput.jpg");
+    public void fillHoles(int searchColour, int fillColour) {
+        boolean visited[][] = new boolean[image.getHeight()][image.getWidth()];
+
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if (searchColour == image.getRGB(x, y) && !visited[y][x]) {
+                    explore(0, y, x, visited, searchColour, fillColour);
+                }
+            }
+        }
+    }
+
+
+    private boolean explore(int currentSize, int y, int x, boolean visited[][], int searchColour, int fillColour) {
+        if (currentSize >= 250)
+            return false;
+
+        int rowNbr[] = new int[]{-1, -1, -1, 0, 0, 1, 1, 1};
+        int colNbr[] = new int[]{-1, 0, 1, -1, 1, -1, 0, 1};
+
+        visited[y][x] = true;
+        currentSize++;
+
+        for (int k = 0; k < 8; ++k)
+            if (isSafe(y + rowNbr[k], x + colNbr[k], visited, searchColour)) {
+                if (explore(currentSize, y + rowNbr[k], x + colNbr[k], visited, searchColour, fillColour))
+                    image.setRGB(x, y, fillColour);
+                else {
+                    image.setRGB(x, y, searchColour);
+                    return false;
+                }
+            }
+        image.setRGB(x, y, fillColour);
+        return true;
+    }
+
+    boolean isSafe(int y, int x, boolean visited[][], int searchColour) {
+        return (y >= 0) && (y < image.getHeight()) &&
+                (x >= 0) && (x < image.getWidth()) &&
+                (image.getRGB(x, y) == searchColour && !visited[y][x]);
+    }
+
+
+    public void saveImage(BufferedImage image, String fileName) {
+        File outputfile = new File(fileName);
         try {
             ImageIO.write(image, "png", outputfile);
         } catch (IOException e) {
@@ -79,5 +122,27 @@ public class ImageProcessor {
 
     private int getBlue(int rgb) {
         return rgb & 0xFF;
+    }
+
+    class Pixel {
+        int rgb;
+        boolean touched = false;
+
+        public Pixel(int rgb) {
+            this.rgb = rgb;
+        }
+
+        private int getRed() {
+            return (rgb >> 16) & 0xFF;
+        }
+
+        private int getGreen() {
+            return (rgb >> 8) & 0xFF;
+        }
+
+        private int getBlue() {
+            return rgb & 0xFF;
+        }
+
     }
 }

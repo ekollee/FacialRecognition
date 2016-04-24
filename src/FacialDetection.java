@@ -1,3 +1,5 @@
+import java.awt.*;
+
 /**
  * Project: FacialRecognition
  * Name: Eric
@@ -12,6 +14,11 @@ public class FacialDetection {
 
         imageProcessor.detectSkin();
 
+        GUIView.getInstance().setImage(imageProcessor.getImage());
+
+        imageProcessor.fillHoles(Color.black.getRGB(), Color.white.getRGB());
+        GUIView.getInstance().setImage(imageProcessor.getImage());
+        imageProcessor.fillHoles(Color.white.getRGB(), Color.black.getRGB());
         GUIView.getInstance().setImage(imageProcessor.getImage());
     }
 
