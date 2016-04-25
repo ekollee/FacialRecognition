@@ -37,7 +37,7 @@ public class GUIView extends JFrame {
     public void setImage(BufferedImage image) {
         int width = 800, height;
 
-        height = image.getHeight() / (image.getWidth() / width);
+        height = (int) (image.getHeight() / ((double) image.getWidth() / (double) width));
         setSize(width, height);
 
         panel.setSize(width, height);
