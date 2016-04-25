@@ -96,12 +96,18 @@ public class ImageProcessor {
         return true;
     }
 
-    boolean isSafe(int y, int x, boolean visited[][], int searchColour) {
+    private boolean isSafe(int y, int x, boolean visited[][], int searchColour) {
         return (y >= 0) && (y < image.getHeight()) &&
                 (x >= 0) && (x < image.getWidth()) &&
                 (image.getRGB(x, y) == searchColour && !visited[y][x]);
     }
 
+    private BufferedImage edgeDetection() {
+        CannyEdgeDetector edgeDetector = new CannyEdgeDetector();
+        edgeDetector.setSourceImage(image);
+        edgeDetector.process();
+        return edgeDetector.getEdgesImage();
+    }
 
     public void saveImage(BufferedImage image, String fileName) {
         File outputfile = new File(fileName);
@@ -122,27 +128,5 @@ public class ImageProcessor {
 
     private int getBlue(int rgb) {
         return rgb & 0xFF;
-    }
-
-    class Pixel {
-        int rgb;
-        boolean touched = false;
-
-        public Pixel(int rgb) {
-            this.rgb = rgb;
-        }
-
-        private int getRed() {
-            return (rgb >> 16) & 0xFF;
-        }
-
-        private int getGreen() {
-            return (rgb >> 8) & 0xFF;
-        }
-
-        private int getBlue() {
-            return rgb & 0xFF;
-        }
-
     }
 }
