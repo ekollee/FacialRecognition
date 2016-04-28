@@ -9,6 +9,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Project: FacialRecognition
@@ -75,9 +78,46 @@ public class ImageProcessor {
         }
     }
 
+    void floodFillInit(int searchColour, int fillColour) {
+        boolean visited[][] = new boolean[image.getHeight()][image.getWidth()];
+
+        floodFill(new Point(0, 0), visited, searchColour, fillColour);
+
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if (searchColour == image.getRGB(x, y) && !visited[y][x]) {
+                    image.setRGB(x, y, fillColour);
+                }
+            }
+        }
+    }
+
+    void floodFill(Point point, boolean[][] visited, int searchColour, int fillColour) {
+        int rowNbr[] = new int[]{-1, -1, -1, 0, 0, 1, 1, 1};
+        int colNbr[] = new int[]{-1, 0, 1, -1, 1, -1, 0, 1};
+
+        Queue<Point> queue = new LinkedBlockingQueue<>();
+        queue.add(point);
+
+        while (!queue.isEmpty()) {
+            Point tempPoint = queue.remove();
+
+            if (image.getRGB(tempPoint.x, tempPoint.y) == searchColour && !visited[tempPoint.y][tempPoint.x]) {
+                visited[tempPoint.y][tempPoint.x] = true;
+                if (point.x != 0 || point.y != 0)
+                    image.setRGB(tempPoint.x, tempPoint.y, fillColour);
+
+                for (int k = 0; k < 8; ++k) {
+                    if (isSafe(tempPoint.y + rowNbr[k], tempPoint.x + colNbr[k], visited, searchColour)) {
+                        queue.add(new Point(tempPoint.x + colNbr[k], tempPoint.y + rowNbr[k]));
+                    }
+                }
+            }
+        }
+    }
 
     private boolean explore(int currentSize, int y, int x, boolean visited[][], int searchColour, int fillColour) {
-        if (currentSize >= 100)
+        if (currentSize >= 300)
             return false;
 
         int rowNbr[] = new int[]{-1, -1, -1, 0, 0, 1, 1, 1};
@@ -178,6 +218,64 @@ public class ImageProcessor {
         }
     }
 
+    void findWhiteBlobDimensions() {
+        boolean visited[][] = new boolean[image.getHeight()][image.getWidth()];
+
+        ArrayList<MinMaxCoord> faceList = new ArrayList<>();
+
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                if (Color.white.getRGB() == image.getRGB(x, y) && !visited[y][x]) {
+                    faceList.add(floodFillGetDimensions(new Point(x, y), visited, Color.white.getRGB(), new MinMaxCoord()));
+                }
+            }
+        }
+
+        for (MinMaxCoord face : faceList)
+            drawRectangle(face);
+
+        saveImage(image, "final.jpg");
+    }
+
+    MinMaxCoord floodFillGetDimensions(Point point, boolean[][] visited, int searchColour, MinMaxCoord coord) {
+        int rowNbr[] = new int[]{-1, -1, -1, 0, 0, 1, 1, 1};
+        int colNbr[] = new int[]{-1, 0, 1, -1, 1, -1, 0, 1};
+
+        Queue<Point> queue = new LinkedBlockingQueue<>();
+        queue.add(point);
+
+        while (!queue.isEmpty()) {
+            Point tempPoint = queue.remove();
+
+            if (image.getRGB(tempPoint.x, tempPoint.y) == searchColour && !visited[tempPoint.y][tempPoint.x]) {
+                visited[tempPoint.y][tempPoint.x] = true;
+                coord.update(tempPoint.x, tempPoint.y);
+
+                for (int k = 0; k < 8; ++k)
+                    if (isSafe(tempPoint.y + rowNbr[k], tempPoint.x + colNbr[k], visited, searchColour))
+                        queue.add(new Point(tempPoint.x + colNbr[k], tempPoint.y + rowNbr[k]));
+            }
+        }
+
+        return coord;
+    }
+
+    void drawRectangle(MinMaxCoord coord) {
+        for (int i = coord.minX; i <= coord.maxX; i++) {
+            for (int j = 0; j < 3; j++) {
+                image.setRGB(i, coord.minY - j, Color.red.getRGB());
+                image.setRGB(i, coord.maxY + j, Color.red.getRGB());
+            }
+        }
+
+        for (int i = coord.minY; i <= coord.maxY; i++) {
+            for (int j = 0; j < 3; j++) {
+                image.setRGB(coord.minX - j, i, Color.red.getRGB());
+                image.setRGB(coord.maxX + j, i, Color.red.getRGB());
+            }
+        }
+    }
+
     private int getRed(int rgb) {
         return (rgb >> 16) & 0xFF;
     }
@@ -188,5 +286,33 @@ public class ImageProcessor {
 
     private int getBlue(int rgb) {
         return rgb & 0xFF;
+    }
+
+    class MinMaxCoord {
+
+        int minX, minY, maxX, maxY;
+
+        public MinMaxCoord() {
+            minX = Integer.MAX_VALUE;
+            minY = Integer.MAX_VALUE;
+            maxX = Integer.MIN_VALUE;
+            maxY = Integer.MIN_VALUE;
+        }
+
+        public void update(int x, int y) {
+            if (x < minX)
+                minX = x;
+            if (y < minY)
+                minY = y;
+            if (x > maxX)
+                maxX = x;
+            if (y > maxY)
+                maxY = y;
+        }
+
+        @Override
+        public String toString() {
+            return minX + "\t" + minY + "\t" + maxX + "\t" + maxY;
+        }
     }
 }

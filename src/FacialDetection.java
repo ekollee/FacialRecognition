@@ -16,15 +16,21 @@ public class FacialDetection {
 
         GUIView.getInstance().setImage(imageProcessor.getImage());
 
-        imageProcessor.fillHoles(Color.black.getRGB(), Color.white.getRGB());
+        imageProcessor.floodFillInit(Color.black.getRGB(), Color.white.getRGB());
+
+//        imageProcessor.fillHoles(Color.black.getRGB(), Color.white.getRGB());
         GUIView.getInstance().setImage(imageProcessor.getImage());
+
         imageProcessor.fillHoles(Color.white.getRGB(), Color.black.getRGB());
         GUIView.getInstance().setImage(imageProcessor.getImage());
 
-        imageProcessor.overlayEdgeDetectionImage();
+//        imageProcessor.overlayEdgeDetectionImage();
 
         GUIView.getInstance().setImage(imageProcessor.getImage());
 
+        imageProcessor.findWhiteBlobDimensions();
+
+        GUIView.getInstance().setImage(imageProcessor.getImage());
     }
 
     public static void main(String[] args) {
