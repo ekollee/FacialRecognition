@@ -24,7 +24,7 @@ public class FacialDetection {
         imageProcessor.fillHoles(Color.white.getRGB(), Color.black.getRGB());
         GUIView.getInstance().setImage(imageProcessor.getImage());
 
-//        imageProcessor.overlayEdgeDetectionImage();
+        imageProcessor.overlayEdgeDetectionImage();
 
         GUIView.getInstance().setImage(imageProcessor.getImage());
 

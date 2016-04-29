@@ -10,6 +10,8 @@ import java.awt.image.ColorConvertOp;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -21,6 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class ImageProcessor {
 
     private BufferedImage image, originalImage;
+    private List<MinMaxCoord> faceList = Collections.synchronizedList(new ArrayList<>());
 
     public ImageProcessor(String imageFileName) {
         try {
@@ -61,8 +64,6 @@ public class ImageProcessor {
                 }
             }
         }
-
-        saveImage(image, "blackWhite.jpg");
     }
 
 
@@ -152,8 +153,6 @@ public class ImageProcessor {
         ColorConvertOp colorConvert = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         colorConvert.filter(originalImage, greyImage);
 
-        saveImage(greyImage, "greyImage.jpg");
-
         int count, averageVertical, averageHorizontal;
         int arrayVertical[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
         int arrayHorizontal[] = {1, 0, -1, 2, 0, -2, 1, 0, -1};
@@ -190,9 +189,6 @@ public class ImageProcessor {
     void overlayEdgeDetectionImage() {
         BufferedImage edgeImage = edgeDetection();
 
-        saveImage(image, "before.jpg");
-        saveImage(edgeImage, "edgeBefore.jpg");
-
         for (int y = 0; y < edgeImage.getHeight(); y++) {
             for (int x = 0; x < edgeImage.getWidth(); x++) {
                 if (image.getRGB(x, y) == Color.white.getRGB() && getRed(edgeImage.getRGB(x, y)) > 50) {
@@ -201,12 +197,8 @@ public class ImageProcessor {
             }
         }
 
-        saveImage(image, "middle.jpg");
-
         fillHoles(Color.black.getRGB(), Color.white.getRGB());
         fillHoles(Color.white.getRGB(), Color.black.getRGB());
-
-        saveImage(image, "after.jpg");
     }
 
     void saveImage(BufferedImage image, String fileName) {
@@ -221,8 +213,6 @@ public class ImageProcessor {
     void findWhiteBlobDimensions() {
         boolean visited[][] = new boolean[image.getHeight()][image.getWidth()];
 
-        ArrayList<MinMaxCoord> faceList = new ArrayList<>();
-
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 if (Color.white.getRGB() == image.getRGB(x, y) && !visited[y][x]) {
@@ -231,10 +221,12 @@ public class ImageProcessor {
             }
         }
 
+        while (true) {
+            if (mergeFaces(10, 5, 3))
+                break;
+        }
         for (MinMaxCoord face : faceList)
             drawRectangle(face);
-
-        saveImage(image, "final.jpg");
     }
 
     MinMaxCoord floodFillGetDimensions(Point point, boolean[][] visited, int searchColour, MinMaxCoord coord) {
@@ -263,17 +255,65 @@ public class ImageProcessor {
     void drawRectangle(MinMaxCoord coord) {
         for (int i = coord.minX; i <= coord.maxX; i++) {
             for (int j = 0; j < 3; j++) {
-                image.setRGB(i, coord.minY - j, Color.red.getRGB());
-                image.setRGB(i, coord.maxY + j, Color.red.getRGB());
+                try {
+                    image.setRGB(i, coord.minY - j, Color.red.getRGB());
+                    image.setRGB(i, coord.maxY + j, Color.red.getRGB());
+                } catch (ArrayIndexOutOfBoundsException ignored) {
+
+                }
             }
         }
 
         for (int i = coord.minY; i <= coord.maxY; i++) {
             for (int j = 0; j < 3; j++) {
-                image.setRGB(coord.minX - j, i, Color.red.getRGB());
-                image.setRGB(coord.maxX + j, i, Color.red.getRGB());
+                try {
+                    image.setRGB(coord.minX - j, i, Color.red.getRGB());
+                    image.setRGB(coord.maxX + j, i, Color.red.getRGB());
+                } catch (ArrayIndexOutOfBoundsException ignored) {
+
+                }
             }
         }
+    }
+
+    boolean mergeFaces(int vertical, int horizontal, double sizeFactor) {
+        for (int i = 0; i < faceList.size(); i++) {
+            MinMaxCoord face = faceList.get(i);
+            for (int i1 = 0; i1 < faceList.size(); i1++) {
+                MinMaxCoord face2 = faceList.get(i1);
+                if (face != face2 && polygonTouching(vertical, horizontal, face, face2) && getPloygonArea(face2) < getPloygonArea(face) / sizeFactor) {
+                    if (face2.minX < face.minX)
+                        face.minX = face2.minX;
+                    if (face2.minY < face.minY)
+                        face.minY = face2.minY;
+                    if (face2.maxX > face.maxX)
+                        face.maxX = face2.maxX;
+                    if (face2.maxY > face.maxY)
+                        face.maxY = face2.maxY;
+                    faceList.remove(face2);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    int getPloygonArea(MinMaxCoord face) {
+        return (face.maxX - face.minX) * (face.maxY - face.minY);
+    }
+
+    boolean polygonTouching(int vertical, int horizontal, MinMaxCoord poly1, MinMaxCoord poly2) {
+
+        Rectangle rectangle1 = new Rectangle();
+        rectangle1.setLocation(poly1.minX - horizontal, poly1.minY - vertical);
+        rectangle1.setSize(poly1.maxX - poly1.minX + horizontal, poly1.maxY - poly1.minY + vertical);
+
+        Rectangle rectangle2 = new Rectangle();
+        rectangle2.setLocation(poly2.minX - horizontal, poly2.minY - vertical);
+        rectangle2.setSize(poly2.maxX - poly2.minX + horizontal, poly2.maxY - poly2.minY + vertical);
+
+        return rectangle1.intersects(rectangle2);
+//        return poly1.minX - horizontal < poly2.maxX + horizontal && poly1.maxX + horizontal > poly2.minX - horizontal && poly1.minY - vertical < poly2.maxY + vertical && poly1.maxY + vertical > poly2.minY - vertical;
     }
 
     private int getRed(int rgb) {
