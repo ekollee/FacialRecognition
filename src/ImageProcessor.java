@@ -6,6 +6,8 @@ import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +41,7 @@ public class ImageProcessor {
     public static void saveImage(BufferedImage image, String fileName) {
         File outputfile = new File(fileName);
         try {
-            ImageIO.write(image, "png", outputfile);
+            ImageIO.write(image, "jpg", outputfile);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,6 +66,13 @@ public class ImageProcessor {
 
     BufferedImage getImage() {
         return image;
+    }
+
+    BufferedImage getOriginalImageCopy() {
+        ColorModel cm = originalImage.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = originalImage.copyData(null);
+        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
 
     void detectSkin() {
@@ -229,13 +238,18 @@ public class ImageProcessor {
                 }
             }
         }
+    }
 
+    void mergeFaces() {
         while (true) {
             if (mergeFaces(10, 5, 3))
                 break;
         }
+    }
+
+    void drawFaceBoxesOnImage(BufferedImage image) {
         for (MinMaxCoord face : faceList)
-            drawRectangle(face);
+            drawRectangle(image, face);
     }
 
     MinMaxCoord floodFillGetDimensions(Point point, boolean[][] visited, int searchColour, MinMaxCoord coord) {
@@ -261,7 +275,7 @@ public class ImageProcessor {
         return coord;
     }
 
-    void drawRectangle(MinMaxCoord coord) {
+    void drawRectangle(BufferedImage image, MinMaxCoord coord) {
         for (int i = coord.minX; i <= coord.maxX; i++) {
             for (int j = 0; j < 3; j++) {
                 try {

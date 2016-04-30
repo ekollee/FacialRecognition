@@ -25,22 +25,32 @@ public class FacialDetection {
 
         imageProcessor.detectSkin();
 
-        ImageProcessor.saveImage(imageProcessor.getImage(), "neuralnet.jpg");
+        ImageProcessor.saveImage(imageProcessor.getImage(), "outImages/neuralnet.jpg");
         GUIView.getInstance().setImage(imageProcessor.getImage());
 
         imageProcessor.floodFillInit(Color.black.getRGB(), Color.white.getRGB());
-        ImageProcessor.saveImage(imageProcessor.getImage(), "blackfill.jpg");
+        ImageProcessor.saveImage(imageProcessor.getImage(), "outImages/blackfill.jpg");
 
         imageProcessor.fillHoles(Color.white.getRGB(), Color.black.getRGB());
-        ImageProcessor.saveImage(imageProcessor.getImage(), "whitefill.jpg");
+        ImageProcessor.saveImage(imageProcessor.getImage(), "outImages/whitefill.jpg");
 
         GUIView.getInstance().setImage(imageProcessor.getImage());
+
 //        imageProcessor.overlayEdgeDetectionImage();
-//
-//        GUIView.getInstance().setImage(imageProcessor.getImage());
-//
+//        ImageProcessor.saveImage(imageProcessor.getImage(), "outImages/edgeDetection.jpg");
+
         imageProcessor.findWhiteBlobDimensions();
-//
+
+        BufferedImage beforeImage = imageProcessor.getOriginalImageCopy();
+        imageProcessor.drawFaceBoxesOnImage(beforeImage);
+        ImageProcessor.saveImage(beforeImage, "outImages/beforeMerge.jpg");
+
+        imageProcessor.mergeFaces();
+
+        BufferedImage afterImage = imageProcessor.getOriginalImageCopy();
+        imageProcessor.drawFaceBoxesOnImage(afterImage);
+        ImageProcessor.saveImage(afterImage, "outImages/afterMerge.jpg");
+
         GUIView.getInstance().setImage(imageProcessor.getImage());
     }
 
