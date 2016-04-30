@@ -1,5 +1,4 @@
 import neuralnetwork.DataReader;
-import neuralnetwork.DataSample;
 import neuralnetwork.NeuralNetwork;
 
 import javax.imageio.ImageIO;
@@ -33,6 +32,31 @@ public class ImageProcessor {
         }
     }
 
+    static BufferedImage importImageAndReturn(File file) throws IOException {
+        return ImageIO.read(file);
+    }
+
+    public static void saveImage(BufferedImage image, String fileName) {
+        File outputfile = new File(fileName);
+        try {
+            ImageIO.write(image, "png", outputfile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static int getRed(int rgb) {
+        return (rgb >> 16) & 0xFF;
+    }
+
+    static int getGreen(int rgb) {
+        return (rgb >> 8) & 0xFF;
+    }
+
+    static int getBlue(int rgb) {
+        return rgb & 0xFF;
+    }
+
     void importImage(File file) throws IOException {
         image = ImageIO.read(file);
         originalImage = ImageIO.read(file);
@@ -52,12 +76,7 @@ public class ImageProcessor {
             for (int x = 0; x < image.getWidth(); x++) {
                 int rgb = image.getRGB(x, y);
 
-                DataSample dataSample = new DataSample();
-                dataSample.data.add(getRed(rgb) / 255.0);
-                dataSample.data.add(getGreen(rgb) / 255.0);
-                dataSample.data.add(getBlue(rgb) / 255.0);
-
-                if (neuralNetwork.forwardPass(dataSample.data).equals("1")) {
+                if (neuralNetwork.isSkin(rgb)) {
                     image.setRGB(x, y, Color.white.getRGB());
                 } else {
                     image.setRGB(x, y, Color.black.getRGB());
@@ -65,7 +84,6 @@ public class ImageProcessor {
             }
         }
     }
-
 
     void fillHoles(int searchColour, int fillColour) {
         boolean visited[][] = new boolean[image.getHeight()][image.getWidth()];
@@ -201,15 +219,6 @@ public class ImageProcessor {
         fillHoles(Color.white.getRGB(), Color.black.getRGB());
     }
 
-    public static void saveImage(BufferedImage image, String fileName) {
-        File outputfile = new File(fileName);
-        try {
-            ImageIO.write(image, "png", outputfile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     void findWhiteBlobDimensions() {
         boolean visited[][] = new boolean[image.getHeight()][image.getWidth()];
 
@@ -314,18 +323,6 @@ public class ImageProcessor {
 
         return rectangle1.intersects(rectangle2);
 //        return poly1.minX - horizontal < poly2.maxX + horizontal && poly1.maxX + horizontal > poly2.minX - horizontal && poly1.minY - vertical < poly2.maxY + vertical && poly1.maxY + vertical > poly2.minY - vertical;
-    }
-
-    private int getRed(int rgb) {
-        return (rgb >> 16) & 0xFF;
-    }
-
-    private int getGreen(int rgb) {
-        return (rgb >> 8) & 0xFF;
-    }
-
-    public static int getBlue(int rgb) {
-        return rgb & 0xFF;
     }
 
     class MinMaxCoord {

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class SkinNeuralNetwork extends NeuralNetwork {
 
     private static final int INPUT_NODES = 3;
-    private static final int HIDDEN_NODES = 8;
+    private static final int HIDDEN_NODES = 6;
     private static final int HIDDEN_LAYERS = 1;
     private static final int OUTPUT_NODES = 2;
     private static final double LEARNING_RATE = 0.005;
@@ -30,4 +30,12 @@ public class SkinNeuralNetwork extends NeuralNetwork {
         return ourInstance;
     }
 
+    boolean isSkin(int rgb) {
+        DataSample dataSample = new DataSample();
+        dataSample.data.add(ImageProcessor.getRed(rgb) / 255.0);
+        dataSample.data.add(ImageProcessor.getGreen(rgb) / 255.0);
+        dataSample.data.add(ImageProcessor.getBlue(rgb) / 255.0);
+
+        return forwardPass(dataSample.data).equals("1");
+    }
 }

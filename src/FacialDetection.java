@@ -1,10 +1,10 @@
-
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,32 +15,74 @@ import java.util.List;
  */
 
 public class FacialDetection {
-    List<ImageProcessor> images = new ArrayList<ImageProcessor>();
+    List<BufferedImage> images = new ArrayList<>();
 
     public FacialDetection() {
-        ImageProcessor imageProcessor = new ImageProcessor("testImage.jpg");
+        ImageProcessor imageProcessor = new ImageProcessor("testImage2.jpg");
         GUIView.getInstance().setImage(imageProcessor.getImage());
 
         //  eigenFacesTest();
 
         imageProcessor.detectSkin();
+
+        ImageProcessor.saveImage(imageProcessor.getImage(), "neuralnet.jpg");
         GUIView.getInstance().setImage(imageProcessor.getImage());
 
         imageProcessor.floodFillInit(Color.black.getRGB(), Color.white.getRGB());
-
-//        imageProcessor.fillHoles(Color.black.getRGB(), Color.white.getRGB());
-        GUIView.getInstance().setImage(imageProcessor.getImage());
+        ImageProcessor.saveImage(imageProcessor.getImage(), "blackfill.jpg");
 
         imageProcessor.fillHoles(Color.white.getRGB(), Color.black.getRGB());
+        ImageProcessor.saveImage(imageProcessor.getImage(), "whitefill.jpg");
 
         GUIView.getInstance().setImage(imageProcessor.getImage());
-        imageProcessor.overlayEdgeDetectionImage();
-
-        GUIView.getInstance().setImage(imageProcessor.getImage());
-
+//        imageProcessor.overlayEdgeDetectionImage();
+//
+//        GUIView.getInstance().setImage(imageProcessor.getImage());
+//
         imageProcessor.findWhiteBlobDimensions();
-
+//
         GUIView.getInstance().setImage(imageProcessor.getImage());
+    }
+
+    public static double[][] transpose(double[][] m) {
+        double[][] temp = new double[m[0].length][m.length];
+        for (int i = 0; i < m.length; i++)
+            for (int j = 0; j < m[0].length; j++)
+                temp[j][i] = m[i][j];
+        return temp;
+    }
+
+    public static double[][] multiplicar(double[][] A, double[][] B) {
+
+        int aRows = A.length;
+        int aColumns = A[0].length;
+        int bRows = B.length;
+        int bColumns = B[0].length;
+
+        if (aColumns != bRows) {
+            throw new IllegalArgumentException("A:Rows: " + aColumns + " did not match B:Columns " + bRows + ".");
+        }
+
+        double[][] C = new double[aRows][bColumns];
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                C[i][j] = 0.00000;
+            }
+        }
+
+        for (int i = 0; i < aRows; i++) { // aRow
+            for (int j = 0; j < bColumns; j++) { // bColumn
+                for (int k = 0; k < aColumns; k++) { // aColumn
+                    C[i][j] += A[i][k] * B[k][j];
+                }
+            }
+        }
+
+        return C;
+    }
+
+    public static void main(String[] args) {
+        new FacialDetection();
     }
 
     private void eigenFacesTest() {
@@ -51,7 +93,11 @@ public class FacialDetection {
             int count = 0;
             for (File child : directoryListing) {
                 // Do something with child
-                images.add(new ImageProcessor(child.getAbsolutePath()));
+                try {
+                    images.add(ImageProcessor.importImageAndReturn(child));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 count++;
                 if (count == 100)
                     break;
@@ -91,13 +137,11 @@ public class FacialDetection {
 
     private double[][] createGreyscaleEigenMatrix() {
         double[][] greyscaleMatrix;
-        greyscaleMatrix = new double[images.get(0).getImage().getHeight() * images.get(0).getImage().getWidth()][images.size()];
-        for (int i = 0; i < images.get(0).getImage().getHeight(); i++) {
-            for (int j = 0; j < images.get(0).getImage().getWidth(); j++) {
+        greyscaleMatrix = new double[images.get(0).getHeight() * images.get(0).getWidth()][images.size()];
+        for (int i = 0; i < images.get(0).getHeight(); i++) {
+            for (int j = 0; j < images.get(0).getWidth(); j++) {
                 for (int k = 0; k < images.size(); k++) {
-
-
-                    greyscaleMatrix[i * images.get(0).getImage().getHeight() + j][k] = ImageProcessor.getBlue(images.get(k).getImage().getRGB(i, j));
+                    greyscaleMatrix[i * images.get(0).getHeight() + j][k] = ImageProcessor.getBlue(images.get(k).getRGB(i, j));
                 }
 
             }
@@ -151,47 +195,5 @@ public class FacialDetection {
             eigenVectors[largestRow][i] = 255;
         }
         return eigenVectors;
-    }
-
-    public static double[][] transpose(double[][] m) {
-        double[][] temp = new double[m[0].length][m.length];
-        for (int i = 0; i < m.length; i++)
-            for (int j = 0; j < m[0].length; j++)
-                temp[j][i] = m[i][j];
-        return temp;
-    }
-
-    public static double[][] multiplicar(double[][] A, double[][] B) {
-
-        int aRows = A.length;
-        int aColumns = A[0].length;
-        int bRows = B.length;
-        int bColumns = B[0].length;
-
-        if (aColumns != bRows) {
-            throw new IllegalArgumentException("A:Rows: " + aColumns + " did not match B:Columns " + bRows + ".");
-        }
-
-        double[][] C = new double[aRows][bColumns];
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 2; j++) {
-                C[i][j] = 0.00000;
-            }
-        }
-
-        for (int i = 0; i < aRows; i++) { // aRow
-            for (int j = 0; j < bColumns; j++) { // bColumn
-                for (int k = 0; k < aColumns; k++) { // aColumn
-                    C[i][j] += A[i][k] * B[k][j];
-                }
-            }
-        }
-
-        return C;
-    }
-
-
-    public static void main(String[] args) {
-        new FacialDetection();
     }
 }
