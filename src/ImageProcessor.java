@@ -201,7 +201,7 @@ public class ImageProcessor {
         fillHoles(Color.white.getRGB(), Color.black.getRGB());
     }
 
-    void saveImage(BufferedImage image, String fileName) {
+    public static void saveImage(BufferedImage image, String fileName) {
         File outputfile = new File(fileName);
         try {
             ImageIO.write(image, "png", outputfile);
@@ -324,7 +324,7 @@ public class ImageProcessor {
         return (rgb >> 8) & 0xFF;
     }
 
-    private int getBlue(int rgb) {
+    public static int getBlue(int rgb) {
         return rgb & 0xFF;
     }
 
