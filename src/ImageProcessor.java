@@ -321,6 +321,16 @@ public class ImageProcessor {
         return true;
     }
 
+    List<BufferedImage> getFaceImages() {
+        List<BufferedImage> faceImages = new ArrayList<>();
+
+        for (MinMaxCoord face : faceList) {
+            faceImages.add(image.getSubimage(face.minX, face.minY, face.getWidth(), face.getHeight()));
+        }
+
+        return faceImages;
+    }
+
     int getPloygonArea(MinMaxCoord face) {
         return (face.maxX - face.minX) * (face.maxY - face.minY);
     }
@@ -348,6 +358,14 @@ public class ImageProcessor {
             minY = Integer.MAX_VALUE;
             maxX = Integer.MIN_VALUE;
             maxY = Integer.MIN_VALUE;
+        }
+
+        int getWidth() {
+            return maxX - minX;
+        }
+
+        int getHeight() {
+            return maxY - minY;
         }
 
         public void update(int x, int y) {
