@@ -70,8 +70,8 @@ public class EigenFaceFactory {
         return eigenFaces;
     }
 
-    public static List<EigenFace> loadEigenFaces(String directory){
-        List <EigenFace> images = new ArrayList<>();
+    public static List<EigenFace> loadEigenFaces(String directory) {
+        List<EigenFace> images = new ArrayList<>();
         File dir = new File(directory);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {
@@ -117,8 +117,8 @@ public class EigenFaceFactory {
     }
 
     public static EigenFace meanEigenFace(List<EigenFace> faces) {
-        EigenFace meanFace = new EigenFace(new BufferedImage(faces.get(0).image.getWidth(),faces.get(0).image.getHeight(),faces.get(0).image.getType()));
-        double [][] averageGreyscale = new double[faces.get(0).image.getWidth()][faces.get(0).image.getHeight()];
+        EigenFace meanFace = new EigenFace(new BufferedImage(faces.get(0).image.getWidth(), faces.get(0).image.getHeight(), faces.get(0).image.getType()));
+        double[][] averageGreyscale = new double[faces.get(0).image.getWidth()][faces.get(0).image.getHeight()];
         for (int i = 0; i < faces.size(); i++) {
             for (int j = 0; j < faces.get(i).image.getWidth(); j++) {
                 for (int k = 0; k < faces.get(i).image.getHeight(); k++) {
@@ -129,7 +129,7 @@ public class EigenFaceFactory {
         for (int i = 0; i < averageGreyscale.length; i++) {
             for (int j = 0; j < averageGreyscale[0].length; j++) {
                 averageGreyscale[i][j] /= faces.size();
-                meanFace.image.setRGB(i,j,new Color((int)Math.round(averageGreyscale[i][j]), (int)Math.round(averageGreyscale[i][j]), (int)Math.round(averageGreyscale[i][j])).getRGB());
+                meanFace.image.setRGB(i, j, new Color((int) Math.round(averageGreyscale[i][j]), (int) Math.round(averageGreyscale[i][j]), (int) Math.round(averageGreyscale[i][j])).getRGB());
 
             }
 

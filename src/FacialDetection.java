@@ -1,11 +1,5 @@
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.RealMatrix;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,9 +14,9 @@ public class FacialDetection {
     public FacialDetection() {
         List<EigenFace> faces = EigenFaceFactory.loadEigenFaces("eigenfaces");
         EigenFace meanFace = EigenFaceFactory.meanEigenFace(faces);
-        GUIView.getInstance().setImage(meanFace.image);
-        ImageProcessor.saveImage(meanFace.image,"meanEigenFace.jpg");
-        ImageProcessor imageProcessor = new ImageProcessor("testImage1.jpg");
+        ImageProcessor.saveImage(meanFace.image, "meanEigenFace.jpg");
+
+        ImageProcessor imageProcessor = new ImageProcessor("testImage2.jpg");
         GUIView.getInstance().setImage(imageProcessor.getImage());
 
 
@@ -39,12 +33,15 @@ public class FacialDetection {
 
         GUIView.getInstance().setImage(imageProcessor.getImage());
 
-//
+//        imageProcessor.overlayEdgeDetectionImage();
+
         imageProcessor.findWhiteBlobDimensions();
 
         BufferedImage beforeImage = imageProcessor.getOriginalImageCopy();
         imageProcessor.drawFaceBoxesOnImage(beforeImage);
         ImageProcessor.saveImage(beforeImage, "outImages/beforeMerge.jpg");
+
+        GUIView.getInstance().setImage(beforeImage);
 
         imageProcessor.mergeFaces();
 
@@ -52,9 +49,10 @@ public class FacialDetection {
         imageProcessor.drawFaceBoxesOnImage(afterImage);
         ImageProcessor.saveImage(afterImage, "outImages/afterMerge.jpg");
 
-        GUIView.getInstance().setImage(imageProcessor.getImage());
-    }
+        GUIView.getInstance().setImage(afterImage);
 
+        System.out.println("VIEW outImages FOLDER TO VIEW IMAGE IN STEPS");
+    }
 
 
     public static void main(String[] args) {
