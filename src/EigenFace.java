@@ -5,7 +5,8 @@ import java.awt.image.BufferedImage;
  */
 public class EigenFace {
     BufferedImage image;
-    public EigenFace(BufferedImage image){
+
+    public EigenFace(BufferedImage image) {
         this.image = image;
     }
 

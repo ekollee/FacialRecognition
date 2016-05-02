@@ -5,16 +5,18 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by erickollee on 2016-04-30.
+ * Project: FacialRecognition
+ * Name: erickollee
+ * Created on 30 April, 2016
  */
 public class EigenFaceFactory {
 
 
-    private EigenFaceFactory(){
+    private EigenFaceFactory() {
 
     }
 
