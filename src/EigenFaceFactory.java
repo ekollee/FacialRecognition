@@ -122,7 +122,7 @@ public class EigenFaceFactory {
         for (int i = 0; i < faces.size(); i++) {
             for (int j = 0; j < faces.get(i).image.getWidth(); j++) {
                 for (int k = 0; k < faces.get(i).image.getHeight(); k++) {
-                    averageGreyscale[j][k] = ImageProcessor.getBlue(faces.get(i).image.getRGB(j, k));
+                    averageGreyscale[j][k] += ImageProcessor.getBlue(faces.get(i).image.getRGB(j, k));
                 }
             }
         }
