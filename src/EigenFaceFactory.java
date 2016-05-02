@@ -47,7 +47,7 @@ public class EigenFaceFactory {
         }
 
         double[][] greyScaleEigenMatrix = createGreyscaleEigenMatrix(images);
-        double[][] meanGreyScaleEigenMatrix = meanEigenface(greyScaleEigenMatrix);
+        double[][] meanGreyScaleEigenMatrix = meanEigenFace(greyScaleEigenMatrix);
         double[][] adjustedGreyscaleEigenMatrix = adjustedGreyscaleEigenMatrix(greyScaleEigenMatrix, meanGreyScaleEigenMatrix);
         RealMatrix covarianceMatrix = new Array2DRowRealMatrix(multiplicar(adjustedGreyscaleEigenMatrix, transpose(adjustedGreyscaleEigenMatrix)));
         org.apache.commons.math3.linear.SingularValueDecomposition svd = new org.apache.commons.math3.linear.SingularValueDecomposition(covarianceMatrix);
@@ -70,6 +70,26 @@ public class EigenFaceFactory {
         return eigenFaces;
     }
 
+    public static List<EigenFace> loadEigenFaces(String directory){
+        List <EigenFace> images = new ArrayList<>();
+        File dir = new File(directory);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+
+            for (File child : directoryListing) {
+                // Do something with child
+                try {
+                    images.add(new EigenFace(ImageProcessor.importImageAndReturn(child)));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        }
+        return images;
+    }
+
     private static double[][] createGreyscaleEigenMatrix(List<BufferedImage> images) {
         double[][] greyscaleMatrix;
         greyscaleMatrix = new double[images.get(0).getHeight() * images.get(0).getWidth()][images.size()];
@@ -78,13 +98,12 @@ public class EigenFaceFactory {
                 for (int k = 0; k < images.size(); k++) {
                     greyscaleMatrix[i * images.get(0).getHeight() + j][k] = ImageProcessor.getBlue(images.get(k).getRGB(i, j));
                 }
-
             }
         }
         return greyscaleMatrix;
     }
 
-    private static double[][] meanEigenface(double[][] greyscaleMatrix) {
+    private static double[][] meanEigenFace(double[][] greyscaleMatrix) {
         double[][] meanFace = new double[greyscaleMatrix.length][1];
 
         for (int i = 0; i < greyscaleMatrix.length; i++) {
@@ -96,6 +115,31 @@ public class EigenFaceFactory {
         }
         return meanFace;
     }
+
+    public static EigenFace meanEigenFace(List<EigenFace> faces) {
+        EigenFace meanFace = new EigenFace(new BufferedImage(faces.get(0).image.getWidth(),faces.get(0).image.getHeight(),faces.get(0).image.getType()));
+        double [][] averageGreyscale = new double[faces.get(0).image.getWidth()][faces.get(0).image.getHeight()];
+        for (int i = 0; i < faces.size(); i++) {
+            for (int j = 0; j < faces.get(i).image.getWidth(); j++) {
+                for (int k = 0; k < faces.get(i).image.getHeight(); k++) {
+                    averageGreyscale[j][k] += ImageProcessor.getBlue(faces.get(i).image.getRGB(j, k));
+                }
+            }
+        }
+        for (int i = 0; i < averageGreyscale.length; i++) {
+            for (int j = 0; j < averageGreyscale[0].length; j++) {
+                averageGreyscale[i][j] /= faces.size();
+                meanFace.image.setRGB(i,j,new Color((int)Math.round(averageGreyscale[i][j]), (int)Math.round(averageGreyscale[i][j]), (int)Math.round(averageGreyscale[i][j])).getRGB());
+
+            }
+
+        }
+
+
+        return meanFace;
+
+    }
+
 
     private static double[][] adjustedGreyscaleEigenMatrix(double[][] greyScaleEigenMatrix, double[][] meanGreyScaleEigenMatrix) {
         double[][] adjustedGreyscaleEigenMatrix = new double[greyScaleEigenMatrix.length][greyScaleEigenMatrix[0].length];

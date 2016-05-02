@@ -1,5 +1,11 @@
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,10 +18,13 @@ public class FacialDetection {
 
 
     public FacialDetection() {
-        List<EigenFace> faces = EigenFaceFactory.generateEigenFaces(10, 100, "jpgsmall");
-
-        ImageProcessor imageProcessor = new ImageProcessor("testImage2.jpg");
+        List<EigenFace> faces = EigenFaceFactory.loadEigenFaces("eigenfaces");
+        EigenFace meanFace = EigenFaceFactory.meanEigenFace(faces);
+        GUIView.getInstance().setImage(meanFace.image);
+        ImageProcessor.saveImage(meanFace.image,"meanEigenFace.jpg");
+        ImageProcessor imageProcessor = new ImageProcessor("testImage1.jpg");
         GUIView.getInstance().setImage(imageProcessor.getImage());
+
 
         imageProcessor.detectSkin();
 
@@ -30,9 +39,7 @@ public class FacialDetection {
 
         GUIView.getInstance().setImage(imageProcessor.getImage());
 
-//        imageProcessor.overlayEdgeDetectionImage();
-//        ImageProcessor.saveImage(imageProcessor.getImage(), "outImages/edgeDetection.jpg");
-
+//
         imageProcessor.findWhiteBlobDimensions();
 
         BufferedImage beforeImage = imageProcessor.getOriginalImageCopy();
@@ -47,6 +54,7 @@ public class FacialDetection {
 
         GUIView.getInstance().setImage(imageProcessor.getImage());
     }
+
 
 
     public static void main(String[] args) {
