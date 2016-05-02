@@ -18,10 +18,12 @@ public class FacialDetection {
 
 
     public FacialDetection() {
-        List<EigenFace> faces = EigenFaceFactory.generateEigenFaces(10,100,"faces");
+        List<EigenFace> faces = EigenFaceFactory.loadEigenFaces("eigenfaces");
+        EigenFace meanFace = EigenFaceFactory.meanEigenFace(faces);
+        GUIView.getInstance().setImage(meanFace.image);
+        ImageProcessor.saveImage(meanFace.image,"meanEigenFace.jpg");
         ImageProcessor imageProcessor = new ImageProcessor("testImage1.jpg");
         GUIView.getInstance().setImage(imageProcessor.getImage());
-
 
         imageProcessor.detectSkin();
 
